@@ -26,9 +26,7 @@ def test_treatment_is_randomized_half_half(sim):
 
 def test_effect_segments_match_documentation(sim):
     two_year = sim["Contract"] == "Two year"
-    lost = (sim["InternetService"] == "Fiber optic") & (
-        sim["PaymentMethod"] == "Electronic check"
-    )
+    lost = (sim["InternetService"] == "Fiber optic") & (sim["PaymentMethod"] == "Electronic check")
     assert (sim.loc[two_year & ~lost, "true_uplift"] < 0).all()  # sleeping dogs
     assert (sim.loc[lost, "true_uplift"] == 0).all()  # lost causes
     assert (sim.loc[~two_year & ~lost, "true_uplift"] > 0).all()

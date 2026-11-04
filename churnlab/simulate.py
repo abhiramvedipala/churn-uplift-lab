@@ -59,9 +59,9 @@ def relative_effect(df: pd.DataFrame) -> np.ndarray:
 
 def simulate(df: pd.DataFrame, seed: int = SEED) -> pd.DataFrame:
     rng = np.random.default_rng(seed)
-    p0 = cross_val_predict(
-        make_logistic(), df[FEATURES], df[TARGET], cv=5, method="predict_proba"
-    )[:, 1]
+    p0 = cross_val_predict(make_logistic(), df[FEATURES], df[TARGET], cv=5, method="predict_proba")[
+        :, 1
+    ]
     p1 = np.clip(p0 * (1 - relative_effect(df)), 0, 1)
     t = rng.binomial(1, 0.5, len(df))
     churn = rng.binomial(1, np.where(t == 1, p1, p0))

@@ -34,6 +34,7 @@ from churnlab.train import XGB_PARAMS, onehot  # noqa: E402
 
 SEED = 11
 TOP = 0.20
+BUDGETS = (0.10, 0.20, 0.30, 0.50, 1.00)
 DOCS = Path("docs")
 METRICS = Path("reports/metrics/uplift.json")
 # causalml uses the true-effect column for its curves if present; we point it
@@ -91,8 +92,10 @@ def plot_qini(curve_df: pd.DataFrame, path: Path) -> None:
     x = np.linspace(0, 100, len(q))
     plt.style.use("default")  # causalml switches matplotlib to a global style on import
     fig, ax = plt.subplots(figsize=(7, 5))
-    for col, label in [("t_learner", "T-learner (2x XGBoost)"),
-                       ("uplift_forest", "Uplift random forest")]:
+    for col, label in [
+        ("t_learner", "T-learner (2x XGBoost)"),
+        ("uplift_forest", "Uplift random forest"),
+    ]:
         ax.plot(x, q[col], label=label)
     # Random targeting gains the same total linearly: a straight line to the endpoint.
     ax.plot([0, 100], [0, q["t_learner"].iloc[-1]], "k--", label="Random targeting")
@@ -117,9 +120,7 @@ def explain_uplift(X: pd.DataFrame, uplift: np.ndarray, path: Path) -> None:
 
 def main() -> dict:
     sim = simulate(load())
-    train, test = train_test_split(
-        sim, test_size=0.3, random_state=SEED, stratify=sim["treatment"]
-    )
+    train, test = train_test_split(sim, test_size=0.3, random_state=SEED, stratify=sim["treatment"])
     y_tr, t_tr = 1 - train["churn"].to_numpy(), train["treatment"].to_numpy()
 
     tl = TLearner().fit(train[FEATURES], t_tr, y_tr)
@@ -156,6 +157,12 @@ def main() -> dict:
         }
         if name in scores:
             report[name] |= {"qini": float(qini[name]), "auuc": float(auuc[name])}
+        # Expected customers retained if offers go to the top `frac` of the full
+        # 7,043-customer base, using mean true uplift of that slice of the test set.
+        report[name]["retained_by_budget"] = {
+            f"{int(frac * 100)}%": round(top_share_uplift(true, s, frac) * frac * len(sim), 1)
+            for frac in BUDGETS
+        }
 
     DOCS.mkdir(exist_ok=True)
     plot_qini(curve_df, DOCS / "qini.png")
