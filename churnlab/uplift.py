@@ -34,6 +34,7 @@ from churnlab.train import XGB_PARAMS, onehot  # noqa: E402
 
 SEED = 11
 TOP = 0.20
+BUDGETS = (0.10, 0.20, 0.30, 0.50, 1.00)
 DOCS = Path("docs")
 METRICS = Path("reports/metrics/uplift.json")
 # causalml uses the true-effect column for its curves if present; we point it
@@ -156,6 +157,12 @@ def main() -> dict:
         }
         if name in scores:
             report[name] |= {"qini": float(qini[name]), "auuc": float(auuc[name])}
+        # Expected customers retained if offers go to the top `frac` of the full
+        # 7,043-customer base, using mean true uplift of that slice of the test set.
+        report[name]["retained_by_budget"] = {
+            f"{int(frac * 100)}%": round(top_share_uplift(true, s, frac) * frac * len(sim), 1)
+            for frac in BUDGETS
+        }
 
     DOCS.mkdir(exist_ok=True)
     plot_qini(curve_df, DOCS / "qini.png")
