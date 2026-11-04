@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Install
+        run: |
+          uv venv --python 3.12 .venv
+          uv pip install --python .venv -e ".[lab,dev]"
+      - name: Lint, regenerate numbers, test
+        run: scripts/check.sh
+      - name: Warn if RESULTS.md drifts from the committed copy
+        run: git diff --stat --exit-code RESULTS.md || echo "::warning::RESULTS.md changed on CI"
+      - name: Build serving image
+        run: docker build -t churn-api .
