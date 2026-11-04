@@ -17,4 +17,4 @@
 ## Next (optional)
 - Recalibrate the churn model on the newest cohort (prior shift).
 - Shrink the Docker image with `xgboost-cpu`.
-- Setup step 6 (Anthropic SDK with token/cost logging) is not used: no phase needed an LLM call, so I didn't add one.
+- Setup step 6 (LLM SDK with token/cost logging) is not used: no phase needed an LLM call, so I didn't add one.
