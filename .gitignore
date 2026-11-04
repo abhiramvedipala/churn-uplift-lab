@@ -9,3 +9,4 @@ data/raw/
 mlruns/
 mlflow.db
 models/
+data/synthetic/
