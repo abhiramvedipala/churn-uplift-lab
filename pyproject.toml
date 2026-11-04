@@ -1,0 +1,38 @@
+[project]
+name = "churn-uplift-lab"
+version = "0.1.0"
+description = "Churn prediction, uplift modeling, A/B testing toolkit and a served churn model."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "pandas>=2.2",
+    "numpy>=1.26",
+    "scipy>=1.13",
+    "scikit-learn>=1.5",
+    "xgboost>=2.1",
+    "matplotlib>=3.9",
+    "fastapi>=0.115",
+    "pydantic>=2.8",
+    "uvicorn>=0.30",
+    "joblib>=1.4",
+]
+
+[project.optional-dependencies]
+lab = ["mlflow>=2.16", "shap>=0.46", "causalml>=0.15"]
+dev = ["pytest>=8", "ruff>=0.6", "httpx>=0.27", "statsmodels>=0.14"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["churnlab", "abtest"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
