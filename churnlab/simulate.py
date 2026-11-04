@@ -13,7 +13,14 @@ Telco has no treatment column, so this script invents one, openly:
        + 0.10 if TechSupport == No             unhappy-with-service segment
        - 0.60 if Contract == Two year          "sleeping dogs": the offer reminds
                                                locked-in customers to shop around
+   r = 0 if Fiber optic and Electronic check  "lost causes": the highest-risk segment
+                                               leaves over service quality, so a
+                                               discount does nothing
    p1 = clip(p0 * (1 - r), 0, 1)
+
+   Without the lost-causes rule the effect is proportional to p0, and plain
+   churn-risk targeting already captures ~95% of the best possible uplift
+   (see DECISIONS.md). Real retention data has lost causes, so v2 adds them.
 4. Outcomes: churn ~ Bernoulli(p1 if T else p0).
 
 true_uplift = p0 - p1 is saved per customer (the reduction in churn
@@ -37,13 +44,17 @@ OUT = Path("data/synthetic/treatment.csv")
 
 
 def relative_effect(df: pd.DataFrame) -> np.ndarray:
-    return (
+    r = (
         0.10
         + 0.30 * (df["Contract"] == "Month-to-month")
         + 0.15 * (df["MonthlyCharges"] > 70)
         + 0.10 * (df["TechSupport"] == "No")
         - 0.60 * (df["Contract"] == "Two year")
-    ).to_numpy()
+    )
+    lost_cause = (df["InternetService"] == "Fiber optic") & (
+        df["PaymentMethod"] == "Electronic check"
+    )
+    return r.where(~lost_cause, 0.0).to_numpy()
 
 
 def simulate(df: pd.DataFrame, seed: int = SEED) -> pd.DataFrame:
