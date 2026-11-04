@@ -7,10 +7,14 @@ Run: python -m churnlab.results
 """
 
 import json
+import math
 import re
 import subprocess
 import sys
 from pathlib import Path
+
+from abtest.power import sample_size_proportions
+from abtest.sequential import peeking_false_positive_rate
 
 M = Path("reports/metrics")
 
@@ -97,6 +101,10 @@ def build() -> str:
         "",
         "| What | Value | Command |",
         "|---|---|---|",
+        "| Customers per arm to detect churn 26.5% -> 23.5% (alpha .05, power .8) | "
+        f"{math.ceil(sample_size_proportions(0.265, 0.235)):,} | `python -m churnlab.results` |",
+        "| False-positive rate when an A/A test is checked at 10 looks (nominal 5%) | "
+        f"{peeking_false_positive_rate(10):.1%} | `python -m churnlab.results` |",
         "| Known-result unit tests (Cohen, statsmodels, scipy, Armitage) | "
         f"{count_tests('tests/test_abtest.py')} | `pytest tests/test_abtest.py` |",
         f"| API tests | {count_tests('tests/test_api.py')} | `pytest tests/test_api.py` |",

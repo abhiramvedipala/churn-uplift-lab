@@ -39,6 +39,8 @@ Test n=2113; true average effect 0.070; best possible mean uplift in the top 20%
 
 | What | Value | Command |
 |---|---|---|
+| Customers per arm to detect churn 26.5% -> 23.5% (alpha .05, power .8) | 3,268 | `python -m churnlab.results` |
+| False-positive rate when an A/A test is checked at 10 looks (nominal 5%) | 19.4% | `python -m churnlab.results` |
 | Known-result unit tests (Cohen, statsmodels, scipy, Armitage) | 20 | `pytest tests/test_abtest.py` |
 | API tests | 21 | `pytest tests/test_api.py` |
 | All tests | 57 | `pytest` |
