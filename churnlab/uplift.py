@@ -92,8 +92,10 @@ def plot_qini(curve_df: pd.DataFrame, path: Path) -> None:
     x = np.linspace(0, 100, len(q))
     plt.style.use("default")  # causalml switches matplotlib to a global style on import
     fig, ax = plt.subplots(figsize=(7, 5))
-    for col, label in [("t_learner", "T-learner (2x XGBoost)"),
-                       ("uplift_forest", "Uplift random forest")]:
+    for col, label in [
+        ("t_learner", "T-learner (2x XGBoost)"),
+        ("uplift_forest", "Uplift random forest"),
+    ]:
         ax.plot(x, q[col], label=label)
     # Random targeting gains the same total linearly: a straight line to the endpoint.
     ax.plot([0, 100], [0, q["t_learner"].iloc[-1]], "k--", label="Random targeting")
@@ -118,9 +120,7 @@ def explain_uplift(X: pd.DataFrame, uplift: np.ndarray, path: Path) -> None:
 
 def main() -> dict:
     sim = simulate(load())
-    train, test = train_test_split(
-        sim, test_size=0.3, random_state=SEED, stratify=sim["treatment"]
-    )
+    train, test = train_test_split(sim, test_size=0.3, random_state=SEED, stratify=sim["treatment"])
     y_tr, t_tr = 1 - train["churn"].to_numpy(), train["treatment"].to_numpy()
 
     tl = TLearner().fit(train[FEATURES], t_tr, y_tr)
