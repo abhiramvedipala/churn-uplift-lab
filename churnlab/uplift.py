@@ -89,7 +89,8 @@ def top_share_uplift(true_uplift: np.ndarray, score: np.ndarray, top: float = TO
 def plot_qini(curve_df: pd.DataFrame, path: Path) -> None:
     q = get_qini(curve_df, outcome_col="y", treatment_col="w", treatment_effect_col=NO_TAU)
     x = np.linspace(0, 100, len(q))
-    fig, ax = plt.subplots(figsize=(6, 4.5))
+    plt.style.use("default")  # causalml switches matplotlib to a global style on import
+    fig, ax = plt.subplots(figsize=(7, 5))
     for col, label in [("t_learner", "T-learner (2x XGBoost)"),
                        ("uplift_forest", "Uplift random forest")]:
         ax.plot(x, q[col], label=label)
