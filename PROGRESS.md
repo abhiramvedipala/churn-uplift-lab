@@ -9,7 +9,7 @@
 - README, DECISIONS.md, docs/INTERVIEW-NOTES.md, CI workflow.
 
 ## What needs me
-- Create the GitHub repo if not done: `gh repo create abhiramvedipala/churn-uplift-lab --private`, then push `main` (not pushed yet). After the first push, confirm the CI badge goes green.
+- Done: `main` is pushed to `github.com/abhiramvedipala/churn-uplift-lab` (public), phases merged through PRs #1 to #4, and CI on `main` is green (run 41916576947, 2026-11-04).
 - Update the resume bullets to the measured numbers below; two differ from the targets:
   - XGBoost does **not** beat the logistic baseline on the cohort split (AUC-PR 0.728 vs 0.746).
   - Top-decile lift is 1.72x, capped at 2.07x by the test cohort's 48% churn rate.
